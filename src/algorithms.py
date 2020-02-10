@@ -89,13 +89,13 @@ class Algo(object):
                     flg_break = 1
                     break
                 else:
-                    if n not in visited:  
+                    if n not in visited:
                         new_dist = graph.nodes[node_id].weights[idx]+cur_dist
                         if new_dist < min_dist[1]:
                             min_dist = [n, new_dist]
-                        distances.update({n: new_dist})
-                        callback((size*size-1)-n, status['VISITING'], 0.05, False)
-
+                            distances.update({n: new_dist})
+                            #queue.append(n)
+                        callback((size*size-1)-n, status['VISITING'], 0.05, False)    
             if flg_break == 0:
                 n = min_dist[0]
                 if n not in visited:
@@ -109,6 +109,8 @@ class Algo(object):
         distances = dict()
         for v in graph.nodes:
             distances.update({v.id: np.Inf})
+        
+        distances.update({root: 0})
 
         J = last % size
         I = last-size*J
@@ -118,21 +120,27 @@ class Algo(object):
             j = v.id % size
             i = v.id-size*j
             heuristic.update({v.id: np.sqrt((i-I)**2+(j-J)**2)})
+            # if i==I or j==J:
+            #     heuristic.update({v.id: 0})
+            # else:
+            #     heuristic.update({v.id: 100})
+            #print({v.id: i})
 
         queue = []
         visited = []
         flg_break = 0
         # Step 1: Insert the root node or starting node of a tree or a graph in the queue.
         queue.append(root)
-        distances.update({root: 0})
+        
 
         while queue: # while queue is not empty
             #Step 2: Pop the top item from the stack and add it to the visited list.
             node_id = queue.pop(0)
             visited.append(node_id)
             callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
+            #print(distances[node_id], heuristic[node_id])
 
-            cur_dist = distances[node_id] + heuristic[node_id]
+            cur_dist = distances[node_id] 
             #Step 3: Find all the adjacent nodes of the node marked visited 
             #        and add the ones that are not yet visited, to the queue.
             min_dist = [node_id, np.Inf]
@@ -143,16 +151,16 @@ class Algo(object):
                     flg_break = 1
                     break
                 else:
-                    if n not in visited and n not in queue:  
-                        new_dist = graph.nodes[node_id].weights[idx]+cur_dist
+                    if n not in visited:
+                        new_dist = graph.nodes[node_id].weights[idx] + cur_dist + heuristic[n]
                         if new_dist < min_dist[1]:
                             min_dist = [n, new_dist]
-                        distances.update({n: new_dist})
-                        callback((size*size-1)-n, status['VISITING'], 0.05, False)
-
+                            distances.update({n: new_dist})
+                            #queue.append(n)
+                        callback((size*size-1)-n, status['VISITING'], 0.05, False)    
             if flg_break == 0:
                 n = min_dist[0]
-                if n not in visited and n not in queue:
+                if n not in visited:
                     queue.append(min_dist[0])
                 
         for v in visited:
