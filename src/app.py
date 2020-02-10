@@ -59,26 +59,37 @@ class MyGrid(GridLayout):
         self.time2paint = 0
         self.body = GridLayout(rows=self.size_, cols=self.size_)
         adjancency_list = []
+        #self.weights = []
+        
         for i in range(self.size_*self.size_):
             node = Node(text=f'{i}')
             if i == 0:            # Top left
-                adjancency_list.append([i, [i+1, N+i]])
+                adjancency_list.append([i, [i+1, N+i], [1, 1]])
+                #self.weights.append([1, 1])
             elif i == (N-1)*N:    # Bottom left
-                adjancency_list.append([i, [i-N, i+1]])
+                adjancency_list.append([i, [i-N, i+1], [1, 1]])
+                #self.weights.append([1, 1])
             elif i == N-1:        # Top Right
-                adjancency_list.append([i, [i-1, i+N]])
+                adjancency_list.append([i, [i-1, i+N], [1, 1]])
+                #self.weights.append([1, 1])
             elif i == (N*N)-1:    # Bottom Right
-                adjancency_list.append([i, [i-N, i-1]])
+                adjancency_list.append([i, [i-N, i-1], [1, 1]])
+                #self.weights.append([1, 1])
             elif i % N == 0:      # Mid Left
-                adjancency_list.append([i, [i-N, i+1, i+N]])
+                adjancency_list.append([i, [i-N, i+1, i+N], [1, 1, 1]])
+                #self.weights.append([1, 1, 1])
             elif i < N:           # Mid Top
-                adjancency_list.append([i, [i-1, i+1, i+N]])
+                adjancency_list.append([i, [i-1, i+1, i+N], [1, 1, 1]])
+                #self.weights.append([1, 1, 1])
             elif (i+1) % N == 0:  # Mid Right
-                adjancency_list.append([i, [i-N, i-1, i+N]])
+                adjancency_list.append([i, [i-N, i-1, i+N], [1, 1, 1]])
+                #self.weights.append([1, 1, 1])
             elif i > (N-1)*N:     # Mid Bottom
-                adjancency_list.append([i, [i-N, i-1, i+1]])
+                adjancency_list.append([i, [i-N, i-1, i+1], [1, 1, 1]])
+                #self.weights.append([1, 1, 1])
             else:                 # Else
-                adjancency_list.append([i, [i-N, i-1, i+1, i+N]])
+                adjancency_list.append([i, [i-N, i-1, i+1, i+N], [1, 1, 1, 1]])
+                #self.weights.append([1, 1, 1, 1])
 
             self.body.add_widget(node)
 
@@ -95,6 +106,9 @@ class MyGrid(GridLayout):
         self.btn_dijsk = Button(text='Dijkstra', font_size=18)
         self.btn_dijsk.bind(on_press=self.main_press)
 
+        self.btn_a_star = Button(text='A*', font_size=18)
+        self.btn_a_star.bind(on_press=self.main_press)
+
         self.btn_clr = Button(text='Clear', font_size=18)
         self.btn_clr.bind(on_press=self.main_press)
 
@@ -102,6 +116,7 @@ class MyGrid(GridLayout):
         self.menuBar.add_widget(self.btn_dfs)
         self.menuBar.add_widget(self.btn_bfs)
         self.menuBar.add_widget(self.btn_dijsk)
+        self.menuBar.add_widget(self.btn_a_star)
         self.menuBar.add_widget(self.btn_clr)
         self.add_widget(self.menuBar)
         self.graph = Graph(adjancency_list)  
@@ -119,6 +134,8 @@ class MyGrid(GridLayout):
             self.bfs()
         elif instance.text == 'Dijkstra':
             self.dijsk()
+        elif instance.text == 'A*':
+            self.a_star()
         elif instance.text == 'Clear':
             self.clear_btns()
    
@@ -151,7 +168,7 @@ class MyGrid(GridLayout):
                  status=self.status, 
                  size=N)
         
-    def dijsk(self):
+    def dijsk(self): # ARRUMAR
         root = Node.clicked_list[0]
         last = Node.clicked_list[1]
         Algo.dijsktra(root=root, 
@@ -160,6 +177,16 @@ class MyGrid(GridLayout):
                       callback=self.change_node_color, 
                       status=self.status, 
                       size=N)
+
+    def a_star(self): # ARRUMAR
+        root = Node.clicked_list[0]
+        last = Node.clicked_list[1]
+        Algo.A_star(root=root, 
+                    last=last, 
+                    graph=self.graph, 
+                    callback=self.change_node_color, 
+                    status=self.status, 
+                    size=N)
     
     def clear_btns(self):
          for v in range(len(self.body.children)):
