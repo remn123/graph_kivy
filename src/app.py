@@ -12,7 +12,7 @@ from kivy.uix.gridlayout import GridLayout
 from graph import Graph 
 from algorithms import Algo 
 
-N = 10
+N = 20
 pygame.mixer.init()
 block_sound = pygame.mixer.Sound('resources/media_block.wav')
 
@@ -23,20 +23,21 @@ class Node(Button):
     rock_list = []
     
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, idx, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
-        self.text = kwargs.get('text')
+        self.text = ''
+        self.idx = idx
         self.rock = 0    
         self.rgba = []
 
     def on_press(self):
-        if int(self.text) in Node.clicked_list:
+        if int(self.idx) in Node.clicked_list:
             self.background_color = 1.0, 1.0, 1.0, 1.0
             Node.click_cnt -= 1
-            Node.clicked_list.remove(int(self.text))
+            Node.clicked_list.remove(int(self.idx))
         elif Node.click_cnt < 2:
             Node.click_cnt += 1
-            Node.clicked_list.append(int(self.text))
+            Node.clicked_list.append(int(self.idx))
             self.background_color = 0.0, 0.3, 1.0, 1.0
 
     def play_block(self, *args):
@@ -62,7 +63,7 @@ class MyGrid(GridLayout):
         #self.weights = []
         
         for i in range(self.size_*self.size_):
-            node = Node(text=f'{i}')
+            node = Node(text='', idx=i)
             if i == 0:            # Top left
                 adjancency_list.append([i, [i+1, N+i], [1, 1]])
                 #self.weights.append([1, 1])
@@ -112,7 +113,7 @@ class MyGrid(GridLayout):
         self.btn_clr = Button(text='Clear', font_size=18)
         self.btn_clr.bind(on_press=self.main_press)
 
-        self.menuBar = GridLayout(rows=1, cols=6)
+        self.menuBar = GridLayout(rows=1, cols=5, size_hint_y=None, height=80)
         self.menuBar.add_widget(self.btn_dfs)
         self.menuBar.add_widget(self.btn_bfs)
         self.menuBar.add_widget(self.btn_dijsk)

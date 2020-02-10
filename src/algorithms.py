@@ -68,11 +68,11 @@ class Algo(object):
         queue = []
         visited = []
         flg_break = 0
-        # Step 1: Insert the root node or starting node of a tree or a graph in the stack.
+        # Step 1: Insert the root node or starting node of a tree or a graph in the queue.
         queue.append(root)
         distances.update({root: 0})
 
-        while queue: # while stack is not empty
+        while queue: # while queue is not empty
             #Step 2: Pop the top item from the stack and add it to the visited list.
             node_id = queue.pop(0)
             visited.append(node_id)
@@ -89,7 +89,7 @@ class Algo(object):
                     flg_break = 1
                     break
                 else:
-                    if n not in visited and n not in queue:  
+                    if n not in visited:  
                         new_dist = graph.nodes[node_id].weights[idx]+cur_dist
                         if new_dist < min_dist[1]:
                             min_dist = [n, new_dist]
@@ -98,7 +98,7 @@ class Algo(object):
 
             if flg_break == 0:
                 n = min_dist[0]
-                if n not in visited and n not in queue:
+                if n not in visited:
                     queue.append(min_dist[0])
                 
         for v in visited:
@@ -122,11 +122,11 @@ class Algo(object):
         queue = []
         visited = []
         flg_break = 0
-        # Step 1: Insert the root node or starting node of a tree or a graph in the stack.
+        # Step 1: Insert the root node or starting node of a tree or a graph in the queue.
         queue.append(root)
         distances.update({root: 0})
 
-        while queue: # while stack is not empty
+        while queue: # while queue is not empty
             #Step 2: Pop the top item from the stack and add it to the visited list.
             node_id = queue.pop(0)
             visited.append(node_id)
