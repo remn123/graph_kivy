@@ -125,8 +125,8 @@ class MyGrid(GridLayout):
         self.status = {'VISITING': [204.0/255.0, 255.0/255.0, 255.0/255.0, 1.0],
                        'VISITED': [0.5, 0.0, 0.0, 1.0],
                        'IDLE': [1.0, 1.0, 1.0, 1.0],
-                       'RESULT': [76.0/255.0, 0.0/255.0, 153.0/255.0, 1.0]}
-
+                       'RESULT': [255.0/255.0, 255.0/255.0, 0.0/255.0, 1.0]}
+        #'RESULT': [76.0/255.0, 0.0/255.0, 153.0/255.0, 1.0]
 
     def main_press(self, instance):
         if instance.text == 'Depth-First Search':

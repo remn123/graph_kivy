@@ -59,49 +59,101 @@ class Algo(object):
         for v in visited:
             callback((size*size-1)-v, status['RESULT'], 0.04)
 
+    # @staticmethod
+    # def dijsktra(root, last, graph, callback, status, size):
+    #     distances = dict()
+    #     for v in graph.nodes:
+    #         distances.update({v.id: np.Inf})
+
+    #     queue = []
+    #     visited = []
+    #     flg_break = 0
+    #     # Step 1: Insert the root node or starting node of a tree or a graph in the queue.
+    #     queue.append(root)
+    #     distances.update({root: 0})
+
+    #     while queue: # while queue is not empty
+    #         #Step 2: Pop the top item from the stack and add it to the visited list.
+    #         node_id = queue.pop(0)
+    #         visited.append(node_id)
+    #         callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
+
+    #         cur_dist = distances[node_id]
+    #         #Step 3: Find all the adjacent nodes of the node marked visited 
+    #         #        and add the ones that are not yet visited, to the queue.
+    #         min_dist = [node_id, np.Inf]
+    #         for idx, n in enumerate(graph.nodes[node_id].children):
+    #             if (n==last):
+    #                 visited.append(n)
+    #                 queue = []
+    #                 flg_break = 1
+    #                 break
+    #             else:
+    #                 if n not in visited:
+    #                     new_dist = graph.nodes[node_id].weights[idx]+cur_dist
+    #                     if new_dist < min_dist[1]:
+    #                         min_dist = [n, new_dist]
+    #                         distances.update({n: new_dist})
+    #                         #queue.append(n)
+    #                     callback((size*size-1)-n, status['VISITING'], 0.05, False)    
+    #         if flg_break == 0:
+    #             n = min_dist[0]
+    #             if n not in visited:
+    #                 queue.append(min_dist[0])
+                
+    #     for v in visited:
+    #         callback((size*size-1)-v, status['RESULT'], 0.04)
+
     @staticmethod
     def dijsktra(root, last, graph, callback, status, size):
-        distances = dict()
-        for v in graph.nodes:
-            distances.update({v.id: np.Inf})
-
-        queue = []
+        
+        distances = []
         visited = []
-        flg_break = 0
-        # Step 1: Insert the root node or starting node of a tree or a graph in the queue.
-        queue.append(root)
-        distances.update({root: 0})
+        for v in range(len(graph.nodes)):
+            distances.append(np.Inf)
+            visited.append([])
 
-        while queue: # while queue is not empty
-            #Step 2: Pop the top item from the stack and add it to the visited list.
-            node_id = queue.pop(0)
-            visited.append(node_id)
-            callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
+        import heapq 
+        # heappop
+        # heappush
+        flg_print = 1
+        
+        # creating Priority Queue (based on minHeap)
+        PQueue = []
+        distances[root] = 0
+        heapq.heappush(PQueue, (distances[root], root, root))
+        while PQueue: # while queue is not empty
+            #Step 2: Pop the top item from the PQueue and add it to the visited list.
+            cur_dist, node_id, last_node = heapq.heappop(PQueue)
+            visited[node_id] = [cur_dist, last_node]
+            if flg_print !=0:
+                callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
 
-            cur_dist = distances[node_id]
             #Step 3: Find all the adjacent nodes of the node marked visited 
             #        and add the ones that are not yet visited, to the queue.
-            min_dist = [node_id, np.Inf]
             for idx, n in enumerate(graph.nodes[node_id].children):
-                if (n==last):
-                    visited.append(n)
-                    queue = []
-                    flg_break = 1
-                    break
-                else:
-                    if n not in visited:
-                        new_dist = graph.nodes[node_id].weights[idx]+cur_dist
-                        if new_dist < min_dist[1]:
-                            min_dist = [n, new_dist]
-                            distances.update({n: new_dist})
-                            #queue.append(n)
-                        callback((size*size-1)-n, status['VISITING'], 0.05, False)    
-            if flg_break == 0:
-                n = min_dist[0]
-                if n not in visited:
-                    queue.append(min_dist[0])
-                
-        for v in visited:
+                if not visited[n]: # not visited yet
+                    new_dist = graph.nodes[node_id].weights[idx]+cur_dist
+                    if new_dist < distances[n]:
+                        distances[n] = new_dist
+                        heapq.heappush(PQueue, (new_dist, n, node_id))
+                    if n == last:
+                        flg_print = 0
+                    if flg_print !=0:
+                        callback((size*size-1)-n, status['VISITING'], 0.05, False)
+
+        target = last
+        path = []
+        path.append(target)
+        sum_dist=0
+        while target != root:
+            dist, last_node = visited[target]
+            path.append(last_node)
+            sum_dist += dist
+            target = last_node
+
+        path.reverse()
+        for v in path:
             callback((size*size-1)-v, status['RESULT'], 0.04)
 
     @staticmethod
