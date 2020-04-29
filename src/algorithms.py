@@ -1,4 +1,5 @@
 import numpy as np
+from utils import uniquecolors
 
 class Algo(object):
 
@@ -165,3 +166,83 @@ class Algo(object):
         path.reverse()
         for v in path:
             callback((size*size-1)-v, status['RESULT'], 0.04)
+
+
+    @staticmethod
+    def flood_fill(ones, matrix, callback, callback2, status, size):
+        if ones:
+            for i in range(size):
+                for j in range(size):
+                    n = j + i*size
+                    if n in ones:
+                        matrix[i][j] = 1
+
+            visited = dict()
+            groups = dict()
+            group = 0
+            for i in range(size):
+                for j in range(size):
+                    n = j + i*size
+                    queue = []
+                    
+                    if matrix[i][j] == 1 and visited.get(j+i*size, True):
+                        queue.append(n)
+
+                    while queue:
+                        node_id = queue.pop(0)
+                        visited.update({node_id: False})
+                        #print(visited)
+                        callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
+                        callback2((size*size-1)-node_id, str(group), 0.01)
+                        groups.update({node_id: group})
+                        J = node_id % size
+                        I = node_id // size
+                        for tpl in [(min(I+1, size-1), J), (I, min(J+1, size-1)), (max(I-1, 0), J), (I, max(J-1, 0))]: # children
+                            k, l = tpl
+                            #print(k, l, size-1, I, J, node_id)
+                            if matrix[k][l] == 1 and visited.get(l+k*size, True):
+                                callback((size*size-1)-l-k*size, status['VISITING'], 0.05, False)
+                                queue.append(l+k*size)
+                        if not queue:
+                            group+=1
+
+            new_status=uniquecolors(len(groups))
+            for v in visited.keys():
+                callback((size*size-1)-v, new_status[groups.get(v)], 0.04)
+        
+        # def rec_ff(i, j, matrix, status, val):
+        #     print(i, j)
+        #     if matrix[i][j] == 0:
+        #         return
+
+        #     callback((size*size-1)-j - i*size, status['VISITED'], 0.05, False)
+        #     matrix[i][j] = -1
+        #     rec_ff(min(i+1, size-1), j, matrix, status, val)
+        #     rec_ff(max(i-1, 0), j, matrix, status, val)
+        #     rec_ff(i, min(j+1, size-1), matrix, status, val)
+        #     rec_ff(i, max(j-1, 0), matrix, status, val)
+
+        # stack = []
+        # visited = []
+        # # Step 1: Insert the root node or starting node of a tree or a graph in the stack.
+        # stack.append(root)
+
+        # while stack: # while stack is not empty
+        #     #Step 2: Pop the top item from the stack and add it to the visited list.
+        #     node_id = stack.pop()
+        #     visited.append(node_id)
+        #     callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
+        #     #Step 3: Find all the adjacent nodes of the node marked visited 
+        #     #        and add the ones that are not yet visited, to the stack.
+        #     for n in graph.nodes[node_id].children:
+        #         if (n==last):
+        #             visited.append(n)
+        #             stack = []
+        #             break
+        #         else:
+        #             if n not in visited:
+        #                 if n not in stack:
+        #                     # Visiting status
+        #                     stack.append(n)
+        #                     callback((size*size-1)-n, status['VISITING'], 0.05, False)
+        

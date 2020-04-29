@@ -1,5 +1,6 @@
 import kivy
 import pygame
+import numpy as np
 kivy.require('1.0.6')
 
 from kivy.app import App
@@ -29,13 +30,14 @@ class Node(Button):
         self.idx = idx
         self.rock = 0    
         self.rgba = []
+        self.group = None
 
     def on_press(self):
         if int(self.idx) in Node.clicked_list:
             self.background_color = 1.0, 1.0, 1.0, 1.0
             Node.click_cnt -= 1
             Node.clicked_list.remove(int(self.idx))
-        elif Node.click_cnt < 2:
+        else:
             Node.click_cnt += 1
             Node.clicked_list.append(int(self.idx))
             self.background_color = 0.0, 0.3, 1.0, 1.0
@@ -49,6 +51,10 @@ class Node(Button):
         self.background_color = r, g, b, a
         return True
 
+    def change_label(self, *args):
+        self.text = self.group
+        return True
+
 
 class MyGrid(GridLayout):
 
@@ -59,6 +65,8 @@ class MyGrid(GridLayout):
         self.cols = 1
         self.time2paint = 0
         self.body = GridLayout(rows=self.size_, cols=self.size_)
+        self.matrix = np.zeros((self.size_, self.size_))
+        
         adjancency_list = []
         #self.weights = []
         
@@ -96,13 +104,14 @@ class MyGrid(GridLayout):
 
         self.add_widget(self.body)
 
-        self.btn_dfs = Button(text='Depth-First Search', font_size=18)
+        self.btn_dfs = Button(text='Depth-First\n Search', font_size=18)
         self.btn_dfs.bind(on_press=self.main_press)
         
-
-        self.btn_bfs = Button(text='Breadth-First Search', font_size=18)
+        self.btn_bfs = Button(text='Breadth-First\n Search', font_size=18)
         self.btn_bfs.bind(on_press=self.main_press)
         
+        self.btn_ff = Button(text='Flood Fill', font_size=18)
+        self.btn_ff.bind(on_press=self.main_press)
 
         self.btn_dijsk = Button(text='Dijkstra', font_size=18)
         self.btn_dijsk.bind(on_press=self.main_press)
@@ -113,9 +122,10 @@ class MyGrid(GridLayout):
         self.btn_clr = Button(text='Clear', font_size=18)
         self.btn_clr.bind(on_press=self.main_press)
 
-        self.menuBar = GridLayout(rows=1, cols=5, size_hint_y=None, height=80)
+        self.menuBar = GridLayout(rows=1, cols=6, size_hint_y=None, height=80)
         self.menuBar.add_widget(self.btn_dfs)
         self.menuBar.add_widget(self.btn_bfs)
+        self.menuBar.add_widget(self.btn_ff)
         self.menuBar.add_widget(self.btn_dijsk)
         self.menuBar.add_widget(self.btn_a_star)
         self.menuBar.add_widget(self.btn_clr)
@@ -129,12 +139,14 @@ class MyGrid(GridLayout):
         #'RESULT': [76.0/255.0, 0.0/255.0, 153.0/255.0, 1.0]
 
     def main_press(self, instance):
-        if instance.text == 'Depth-First Search':
+        if instance.text == 'Depth-First\n Search':
             self.dfs()
-        elif instance.text == 'Breadth-First Search':
+        elif instance.text == 'Breadth-First\n Search':
             self.bfs()
         elif instance.text == 'Dijkstra':
             self.dijsk()
+        elif instance.text == 'Flood Fill':
+            self.flood_fill()
         elif instance.text == 'A*':
             self.a_star()
         elif instance.text == 'Clear':
@@ -147,6 +159,12 @@ class MyGrid(GridLayout):
             Clock.schedule_once(self.body.children[i].play_block, self.time2paint)
             self.time2paint += block_sound.get_length()/2
         Clock.schedule_once(self.body.children[i].change_my_color, self.time2paint) 
+        return True
+
+    def change_node_label(self, i, group, dt):
+        self.body.children[i].group = group
+        self.time2paint += dt
+        Clock.schedule_once(self.body.children[i].change_label, self.time2paint) 
         return True
 
     def dfs(self):
@@ -168,6 +186,15 @@ class MyGrid(GridLayout):
                  callback=self.change_node_color, 
                  status=self.status, 
                  size=N)
+    
+    def flood_fill(self):
+        ones = Node.clicked_list
+        Algo.flood_fill(ones=ones,  
+                        matrix=self.matrix, 
+                        callback=self.change_node_color,
+                        callback2=self.change_node_label, 
+                        status=self.status, 
+                        size=N)
         
     def dijsk(self): # ARRUMAR
         root = Node.clicked_list[0]
@@ -192,9 +219,11 @@ class MyGrid(GridLayout):
     def clear_btns(self):
          for v in range(len(self.body.children)):
             self.body.children[(N*N-1)-v].background_color = self.status['IDLE']
+            self.body.children[(N*N-1)-v].text = ''
             Node.click_cnt = 0
             Node.clicked_list = []
             self.time2paint = 0
+            self.matrix = np.zeros((self.size_, self.size_))
 
 class MyApp(App):
 
