@@ -66,7 +66,7 @@ class Algo(object):
         distances = []
         visited = []
         for v in range(len(graph.nodes)):
-            distances.append(np.Inf)
+            distances.append(np.inf)
             visited.append([])
 
         import heapq 
@@ -119,7 +119,7 @@ class Algo(object):
         I = last-size*J
         heuristic = dict()
         for v in range(len(graph.nodes)):
-            distances.append(np.Inf)
+            distances.append(np.inf)
             visited.append([])
             j = v % size
             i = v-size*j
@@ -209,40 +209,3 @@ class Algo(object):
             new_status=uniquecolors(len(groups))
             for v in visited.keys():
                 callback((size*size-1)-v, new_status[groups.get(v)], 0.04)
-        
-        # def rec_ff(i, j, matrix, status, val):
-        #     print(i, j)
-        #     if matrix[i][j] == 0:
-        #         return
-
-        #     callback((size*size-1)-j - i*size, status['VISITED'], 0.05, False)
-        #     matrix[i][j] = -1
-        #     rec_ff(min(i+1, size-1), j, matrix, status, val)
-        #     rec_ff(max(i-1, 0), j, matrix, status, val)
-        #     rec_ff(i, min(j+1, size-1), matrix, status, val)
-        #     rec_ff(i, max(j-1, 0), matrix, status, val)
-
-        # stack = []
-        # visited = []
-        # # Step 1: Insert the root node or starting node of a tree or a graph in the stack.
-        # stack.append(root)
-
-        # while stack: # while stack is not empty
-        #     #Step 2: Pop the top item from the stack and add it to the visited list.
-        #     node_id = stack.pop()
-        #     visited.append(node_id)
-        #     callback((size*size-1)-node_id, status['VISITED'], 0.05, False)
-        #     #Step 3: Find all the adjacent nodes of the node marked visited 
-        #     #        and add the ones that are not yet visited, to the stack.
-        #     for n in graph.nodes[node_id].children:
-        #         if (n==last):
-        #             visited.append(n)
-        #             stack = []
-        #             break
-        #         else:
-        #             if n not in visited:
-        #                 if n not in stack:
-        #                     # Visiting status
-        #                     stack.append(n)
-        #                     callback((size*size-1)-n, status['VISITING'], 0.05, False)
-        
